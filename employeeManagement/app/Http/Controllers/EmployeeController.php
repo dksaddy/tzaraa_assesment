@@ -13,7 +13,7 @@ class EmployeeController extends Controller
     public function getAllEmployees()
     {
         $employee = Employee::with('designation.department')->get();
-       $departments = Department::all(); 
+        $departments = Department::all(); 
         return view('employee.index', compact('employee', 'departments'));
     }
 
@@ -22,6 +22,13 @@ class EmployeeController extends Controller
         $search = $request->query('search');
         $deptId = $request->query('department_id');
         $status = $request->query('status');
+
+        /*
+        Line: 33. Without the with() method, if you tried to access $employee->designation->name in a loop, 
+                  Laravel would run a new database query for every single employee.
+        Line: 35: $search: checks is empty or not, use($search) for access the variable in the closure function.
+        Line: 37: query,q --> store sql query. q -> add extra parentheses to group the OR conditions together.
+        */
 
         $employee = Employee::with('designation.department')
             // Search Filter
