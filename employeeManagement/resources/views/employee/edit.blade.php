@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Employee</title>
     <style>
-        /* Reset and Center Layout */
+        /* Reset and Core Layout */
         * {
             margin: 0;
             padding: 0;
@@ -14,29 +14,38 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: #f3f4f6;
             display: flex;
             justify-content: center;
+            /* Horizontal Center */
             align-items: center;
+            /* Vertical Center */
             min-height: 100vh;
+            width: 100%;
             padding: 20px;
         }
 
-        /* Form Card */
+        /* This targets the wrapper <div> you added */
+        body>div {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         form {
             background: #ffffff;
             padding: 32px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 450px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
         }
 
-        /* Text Inputs and Dropdowns */
+        /* Inputs, Selects & Buttons */
         input[type="text"],
         input[type="email"],
         select {
@@ -46,16 +55,16 @@
             border-radius: 8px;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s;
         }
 
         input:focus,
         select:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            ring: 2px solid #3b82f6;
         }
 
-        /* Radio Button Group */
+        /* Status Selection */
         .status-group {
             display: flex;
             gap: 20px;
@@ -80,7 +89,6 @@
             height: 17px;
         }
 
-        /* Update Button */
         button[type="submit"] {
             background-color: #2563eb;
             color: white;
@@ -91,43 +99,113 @@
             cursor: pointer;
             font-size: 16px;
             transition: background 0.2s;
-            margin-top: 10px;
         }
 
         button[type="submit"]:hover {
             background-color: #1d4ed8;
+        }
+
+        /* Modern Error Box */
+        .error-box {
+            width: 100%;
+        }
+
+        .error-box ul {
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 12px 12px 12px 30px;
+            border-radius: 8px;
+            list-style: disc;
+            color: #b91c1c;
+            font-size: 13px;
+        }
+
+        /* Hide error box if no errors exist to keep layout clean */
+        .error-box:empty {
+            display: none;
         }
     </style>
 </head>
 
 <body>
 
-    <form action="{{ route('employee.update', $emp->id) }}" method="POST">
-        <h2 style="text-align: center; margin-bottom: 10px; color: #1e293b;">Edit Employee</h2>
-        @csrf
-        @method('PUT')
+    <div>
 
-        <input type="text" name="name" value="{{ $emp->name }}">
-        <input type="email" name="email" value="{{ $emp->email }}">
-        <input type="text" name="phone" value="{{ $emp->phone }}">
-
-        <select name="designation_id">
-            @foreach($designations as $designation)
-                <option value="{{ $designation->id }}" {{ $emp->designation_id == $designation->id ? 'selected' : '' }}>
-                    {{ $designation->name }}
-                </option>
-            @endforeach
-        </select>
-
-        <div class="status-group">
-            <label><input type="radio" name="status" value="active" {{ $emp->status == 'active' ? 'checked' : '' }}>
-                Active</label>
-            <label><input type="radio" name="status" value="inactive" {{ $emp->status == 'inactive' ? 'checked' : '' }}>
-                Inactive</label>
+        <div class="error-box">
+            @if ($errors->any())
+                <div style="color: red;">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
 
-        <button type="submit">Update Employee</button>
-    </form>
+        <form action="{{ route('employee.update', $emp->id) }}" method="POST">
+            <h2 style="text-align: center; margin-bottom: 10px; color: #1e293b;">Edit Employee</h2>
+            @csrf
+            @method('PUT')
+
+            <input type="text" name="name" value="{{ $emp->name }}">
+            <input type="email" name="email" value="{{ $emp->email }}">
+            <input type="text" name="phone" value="{{ $emp->phone }}">
+
+            <select name="department_id" id="department_id">
+                @foreach($departments as $dept)
+                    <option value="{{ $dept->id }}" {{ $emp->department_id == $dept->id ? 'selected' : '' }}>
+                        {{ $dept->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            <select name="designation_id" id="designation_id">
+                @foreach($designations as $designation)
+                    <option value="{{ $designation->id }}" {{ $emp->designation_id == $designation->id ? 'selected' : '' }}>
+                        {{ $designation->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            <div class="status-group">
+                <label><input type="radio" name="status" value="active" {{ $emp->status == 'active' ? 'checked' : '' }}>
+                    Active</label>
+                <label><input type="radio" name="status" value="inactive" {{ $emp->status == 'inactive' ? 'checked' : '' }}>
+                    Inactive</label>
+            </div>
+
+            <button type="submit">Update Employee</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('department_id').addEventListener('change', function () {
+            let deptId = this.value;
+            let designationSelect = document.getElementById('designation_id');
+
+            designationSelect.innerHTML = '<option value="">Loading...</option>';
+
+            if (deptId) {
+                fetch(`/get-designations/${deptId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        designationSelect.innerHTML = '<option value="">Select Designation</option>';
+                        data.forEach(designation => {
+                            let option = document.createElement('option');
+                            option.value = designation.id;
+                            option.text = designation.name;
+                            designationSelect.add(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching designations:', error));
+            } else {
+                designationSelect.innerHTML = '<option value="">Select Designation</option>';
+            }
+        });
+    </script>
+
 
 </body>
 

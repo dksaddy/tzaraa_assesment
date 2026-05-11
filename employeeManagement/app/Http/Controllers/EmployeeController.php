@@ -31,7 +31,6 @@ class EmployeeController extends Controller
         */
 
         $employee = Employee::with('designation', 'department')
-            // Search Filter
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%$search%")
@@ -39,17 +38,14 @@ class EmployeeController extends Controller
                         ->orWhere('phone', 'like', "%$search%");
                 });
             })
-            // Department Filter (Searching through the designation relationship)
             ->when($deptId, function ($query) use ($deptId) {
                 $query->where('department_id', $deptId);
             })
-            // Status Filter
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
             ->get();
 
-        // You also need to pass departments to the view for the dropdown
         $departments = Department::all();
 
         return view('employee.index', compact('employee', 'departments'));
@@ -62,11 +58,6 @@ class EmployeeController extends Controller
         return view('employee.add', compact('departments'));
     }
 
-    public function getDesignations($departmentId)
-    {
-        $designations = Designation::where('department_id', $departmentId)->get();
-        return response()->json($designations);
-    }
 
     public function store(Request $request)
     {
@@ -84,29 +75,36 @@ class EmployeeController extends Controller
     }
 
 
-    // public function edit($id)
-    // {
-    //     $emp = Employee::findOrFail($id);
-    //     $designations = Designation::all();
-    //     return view('employee.edit', compact('emp', 'designations'));
-    // }
+    public function edit($id)
+    {
+        $emp = Employee::findOrFail($id);
+        $departments = Department::all();
+        $designations = Designation::where('department_id', $emp->department_id)->get();
+        return view('employee.edit', compact('emp', 'departments', 'designations'));
+    }
+
+    public function getDesignations($department_id) {
+        $designations = Designation::where('department_id', $department_id)->get();
+        return response()->json($designations);
+    }
 
 
-    // public function update(Request $request, $id)
-    // {
-    //     $emp = Employee::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $emp = Employee::findOrFail($id);
 
-    //     $validated = $request->validate([
-    //         'name' => 'required',
-    //         'email' => 'required|email|unique:employee,email,' . $id,
-    //         'phone' => 'required',
-    //         'designation_id' => 'required',
-    //         'status' => 'required'
-    //     ]);
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:employee,email,' . $id,
+            'phone' => 'required',
+            'designation_id' => 'required',
+            'department_id' => 'required',
+            'status' => 'required',
+        ]);
 
-    //     $emp->update($validated);
-    //     return redirect('/')->with('success', 'Employee updated successfully!');
-    // }
+        $emp->update($validated);
+        return redirect('/')->with('success', 'Employee updated successfully!');
+    }
 
 
     public function destroy($id)
