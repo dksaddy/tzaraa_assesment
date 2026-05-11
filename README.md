@@ -89,3 +89,10 @@ Problem I am facing
 name method confusionM
 I might need to watch the layout again [Lecture 12]
 gist.github.com/keeguon/2310008 [country list]
+
+
+Watching Tutorial again:
+ -belongs to --> child to parent.
+ -has --> parent to child.
+  --pivot(junction) table: hold the info of two separate table. like classes:subject-class:subject.
+  

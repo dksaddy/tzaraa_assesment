@@ -24,7 +24,8 @@ class Employee extends Model
         'email',
         'phone',
         'designation_id',
-        'status'
+        'status',
+        'department_id'
     ];
     
 }

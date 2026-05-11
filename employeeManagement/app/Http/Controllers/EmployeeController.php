@@ -12,49 +12,48 @@ class EmployeeController extends Controller
     //
     public function getAllEmployees()
     {
-        //$departments = Department::all(); 
-        //return view('employee.index', compact('employee', 'departments'));
+        $employee = Employee::with(['designation', 'department'])->get();
+        $departments = Department::all(); 
+        return view('employee.index', compact('employee', 'departments'));
     }
 
-    // public function searchEmployees(Request $request)
-    // {
-    //     $search = $request->query('search');
-    //     $deptId = $request->query('department_id');
-    //     $status = $request->query('status');
+    public function searchEmployees(Request $request)
+    {
+        $search = $request->query('search');
+        $deptId = $request->query('department_id');
+        $status = $request->query('status');
 
-    //     /*
-    //     Line: 33. Without the with() method, if you tried to access $employee->designation->name in a loop, 
-    //               Laravel would run a new database query for every single employee.
-    //     Line: 35: $search: checks is empty or not, use($search) for access the variable in the closure function.
-    //     Line: 37: query,q --> store sql query. q -> add extra parentheses to group the OR conditions together.
-    //     */
+        /*
+        Line: 33. Without the with() method, if you tried to access $employee->designation->name in a loop, 
+                  Laravel would run a new database query for every single employee.
+        Line: 35: $search: checks is empty or not, use($search) for access the variable in the closure function.
+        Line: 37: query,q --> store sql query. q -> add extra parentheses to group the OR conditions together.
+        */
 
-    //     $employee = Employee::with('designation.department')
-    //         // Search Filter
-    //         ->when($search, function ($query) use ($search) {
-    //             $query->where(function ($q) use ($search) {
-    //                 $q->where('name', 'like', "%$search%")
-    //                     ->orWhere('email', 'like', "%$search%")
-    //                     ->orWhere('phone', 'like', "%$search%");
-    //             });
-    //         })
-    //         // Department Filter (Searching through the designation relationship)
-    //         ->when($deptId, function ($query) use ($deptId) {
-    //             $query->whereHas('designation', function ($q) use ($deptId) {
-    //                 $q->where('department_id', $deptId);
-    //             });
-    //         })
-    //         // Status Filter
-    //         ->when($status, function ($query) use ($status) {
-    //             $query->where('status', $status);
-    //         })
-    //         ->get();
+        $employee = Employee::with('designation', 'department')
+            // Search Filter
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%");
+                });
+            })
+            // Department Filter (Searching through the designation relationship)
+            ->when($deptId, function ($query) use ($deptId) {
+                $query->where('department_id', $deptId);
+            })
+            // Status Filter
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->get();
 
-    //     // You also need to pass departments to the view for the dropdown
-    //     $departments = Department::all();
+        // You also need to pass departments to the view for the dropdown
+        $departments = Department::all();
 
-    //     return view('employee.index', compact('employee', 'departments'));
-    // }
+        return view('employee.index', compact('employee', 'departments'));
+    }
 
 
     // public function create()

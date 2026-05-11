@@ -155,7 +155,7 @@
             <td>{{ $emp->id }}</td>
             <td><strong>{{ $emp->name }}</strong></td>
             <td>{{ $emp->designation->name ?? 'N/A' }}</td>
-            <td>{{ $emp->designation->department->name ?? 'N/A' }}</td>
+            <td>{{ $emp->department->name ?? 'N/A' }}</td>
             <td>{{ $emp->email }}</td>
             <td>{{ $emp->phone }}</td>
             <td>
