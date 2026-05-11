@@ -56,27 +56,32 @@ class EmployeeController extends Controller
     }
 
 
-    // public function create()
-    // {
-    //     $designations = Designation::all();
-    //     return view('employee.add', compact('designations'));
-    // }
+    public function create()
+    {
+        $departments = Department::all(); 
+        return view('employee.add', compact('departments'));
+    }
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name'           => 'required|string|max:255',
-    //         'email'          => 'required|email|unique:employee,email',
-    //         'phone'          => 'required|unique:employee,phone',
-    //         'designation_id' => 'required|exists:designation,id',
-    //     ]);
+    public function getDesignations($departmentId)
+    {
+        $designations = Designation::where('department_id', $departmentId)->get();
+        return response()->json($designations);
+    }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|unique:employee,email',
+            'phone'          => 'required|unique:employee,phone',
+            'department_id'  => 'required|exists:department,id', // Added validation
+            'designation_id' => 'required|exists:designation,id',
+            'status'         => 'required|in:active,inactive'
+        ]);
 
-    //     Employee::create($validated);
-
-    //     return redirect('/')->with('success', 'Employee added successfully!');
-    // }
-
+        Employee::create($validated);
+        return redirect('/')->with('success', 'Employee added successfully!');
+    }
 
 
     // public function edit($id)
@@ -121,5 +126,4 @@ class EmployeeController extends Controller
             ], 404);
         }
     }
-
 }

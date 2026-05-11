@@ -155,13 +155,19 @@
             <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
             <input type="text" name="phone" placeholder="Phone" value="{{ old('phone') }}">
 
-            <!-- Designation Dropdown -->
-            <select name="designation_id">
-                <option value="">Select Designation</option>
-                @foreach($designations as $designation)
-                    <option value="{{ $designation->id }}">{{ $designation->name }}</option>
+            <!-- Department Dropdown -->
+            <select name="department_id" id="department_id">
+                <option value="">Select Department</option>
+                @foreach($departments as $dept)
+                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                 @endforeach
             </select>
+
+            <!-- Designation Dropdown (Starts empty) -->
+            <select name="designation_id" id="designation_id">
+                <option value="">Select Designation</option>
+            </select>
+
 
             <!-- Status Radio Buttons -->
             <div class="status-group">
@@ -176,6 +182,29 @@
             <button type="submit">Add Employee</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('department_id').addEventListener('change', function () {
+            let deptId = this.value;
+            let designationSelect = document.getElementById('designation_id');
+
+            designationSelect.innerHTML = '<option value="">Select Designation</option>';
+
+            if (deptId) {
+                fetch(`/get-designations/${deptId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(designation => {
+                            let option = document.createElement('option');
+                            option.value = designation.id;
+                            option.text = designation.name;
+                            designationSelect.add(option);
+                        });
+                    });
+            }
+        });
+    </script>
+
 
 </body>
 

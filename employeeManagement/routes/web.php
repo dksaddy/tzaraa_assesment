@@ -13,6 +13,7 @@ Route::get('/',[EmployeeController::class,'getAllEmployees']);
 Route::get('/search',[EmployeeController::class,'searchEmployees']);
 
 Route::get('/add',[EmployeeController::class,'create'])->name('add');
+Route::get('/get-designations/{department_id}', [EmployeeController::class, 'getDesignations']);
 Route::post('/add', [EmployeeController::class, 'store'])->name('employee.store');
 
 Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
