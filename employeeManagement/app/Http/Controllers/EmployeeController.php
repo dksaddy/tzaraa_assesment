@@ -13,7 +13,7 @@ class EmployeeController extends Controller
     public function getAllEmployees()
     {
         $employee = Employee::with(['designation', 'department'])->get();
-        $departments = Department::all(); 
+        $departments = Department::all();
         return view('employee.index', compact('employee', 'departments'));
     }
 
@@ -78,7 +78,7 @@ class EmployeeController extends Controller
     // }
 
 
-    
+
     // public function edit($id)
     // {
     //     $emp = Employee::findOrFail($id);
@@ -86,7 +86,7 @@ class EmployeeController extends Controller
     //     return view('employee.edit', compact('emp', 'designations'));
     // }
 
-    
+
     // public function update(Request $request, $id)
     // {
     //     $emp = Employee::findOrFail($id);
@@ -103,11 +103,23 @@ class EmployeeController extends Controller
     //     return redirect('/')->with('success', 'Employee updated successfully!');
     // }
 
-    
-    // public function destroy($id)
-    // {
-    //     $emp = Employee::findOrFail($id);
-    //     $emp->delete();
-    //     return redirect('/')->with('success', 'Employee deleted successfully!');
-    // }
+
+    public function destroy($id)
+    {
+        try {
+            $emp = Employee::findOrFail($id);
+            $emp->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee deleted successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Could not find or delete employee.'
+            ], 404);
+        }
+    }
+
 }

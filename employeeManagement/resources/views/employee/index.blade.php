@@ -151,7 +151,7 @@
       </thead>
       <tbody>
         @foreach($employee as $emp)
-          <tr>
+          <tr id="employee-row-{{ $emp->id }}">
             <td>{{ $emp->id }}</td>
             <td><strong>{{ $emp->name }}</strong></td>
             <td>{{ $emp->designation->name ?? 'N/A' }}</td>
@@ -163,26 +163,54 @@
                 {{ $emp->status }}
               </span>
             </td>
-
             <td>
-
               <a href="{{ route('employee.edit', $emp->id) }}" class="btn-action">Edit</a>
 
-              <form action="{{ route('employee.destroy', $emp->id) }}" method="POST" style="display:inline;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn-action" style="color:red; border:none; background:none; cursor:pointer;"
-                  onclick="return confirm('Are you sure?')">
-                  Delete
-                </button>
-              </form>
+              <!-- The AJAX Delete Button -->
+              <button type="button" class="btn-action" style="color:red; border:none; background:none; cursor:pointer;"
+                onclick="deleteEmployee({{ $emp->id }})">
+                Delete
+              </button>
             </td>
-
           </tr>
+
         @endforeach
       </tbody>
     </table>
   </div>
+
+  <script>
+    function deleteEmployee(id) {
+      if (!confirm('Are you sure you want to delete this employee?')) return;
+
+      fetch(`/employee/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const row = document.getElementById(`employee-row-${id}`);
+            row.style.transition = "all 0.4s ease";
+            row.style.backgroundColor = "#fee2e2"; // Optional: turn red briefly
+            row.style.opacity = "0";
+
+            setTimeout(() => row.remove(), 400);
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Something went wrong!');
+        });
+    }
+  </script>
+
 
 </body>
 
