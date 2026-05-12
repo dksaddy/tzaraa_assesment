@@ -124,4 +124,23 @@ class EmployeeController extends Controller
             ], 404);
         }
     }
+
+
+    public function bioUpdate(Request $request, $id)
+    {
+        $emp = Employee::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:employee,email,' . $id,
+            'phone' => 'required',
+        ]);
+
+        $emp->update($validated);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee bio updated successfully!'
+        ]);
+    }
 }

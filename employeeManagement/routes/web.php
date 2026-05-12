@@ -21,6 +21,8 @@ Route::put('/employee/update/{id}', [EmployeeController::class, 'update'])->name
 
 Route::delete('/employee/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 
+Route::patch('/employee/bio/{id}', [EmployeeController::class, 'bioUpdate'])->name('employee.bioUpdate');
+
 Route::fallback(function() {
     return view ('fallback');
 });
