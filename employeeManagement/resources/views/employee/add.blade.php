@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Employee</title>
-    <link rel="stylesheet" href="{{ asset('CSS/add.css') }}">
+    <link rel="stylesheet" href="{{ asset('CSS/add_and_edit.css') }}">
 </head>
 
 <body>
@@ -61,28 +61,11 @@
             <button type="submit">Add Employee</button>
         </form>
 
-        <script>
-            document.getElementById('department_id').addEventListener('change', function () {
-                let deptId = this.value;
-                let designationSelect = document.getElementById('designation_id');
-
-                designationSelect.innerHTML = '<option value="">Select Designation</option>';
-
-                if (deptId) {
-                    fetch(`/get-designations/${deptId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.forEach(designation => {
-                                let option = document.createElement('option');
-                                option.value = designation.id;
-                                option.text = designation.name;
-                                designationSelect.add(option);
-                            });
-                        });
-                }
-            });
-        </script>
     @endsection
+
+    @push('scripts')
+        @include('employee.partials.designation-script')
+    @endpush
 
 </body>
 

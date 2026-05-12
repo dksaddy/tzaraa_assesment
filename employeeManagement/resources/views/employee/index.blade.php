@@ -76,7 +76,7 @@
                 </span>
               </td>
               <td>
-                <a href="{{ route('employee.edit', $emp->id) }}" class="btn-action">Edit</a>
+                <a href="{{ route('employee.edit', $emp->id) }}" class="btn-action">Full Edit</a>
 
                 <!-- The AJAX Delete Button -->
                 <button type="button" class="btn-action" style="color:red; border:none; background:none; cursor:pointer;"
@@ -92,36 +92,9 @@
     </div>
   @endsection
 
-  <script>
-    function deleteEmployee(id) {
-      if (!confirm('Are you sure you want to delete this employee?')) return;
-
-      fetch(`/employee/delete/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            const row = document.getElementById(`employee-row-${id}`);
-            row.classList.add('deleting');
-            setTimeout(() => row.remove(), 400);
-
-          } else {
-            alert('Error: ' + data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Something went wrong!');
-        });
-    }
-  </script>
-
+  @push('scripts')
+    @include('employee.partials.delete-script')
+  @endpush
 
 </body>
 
