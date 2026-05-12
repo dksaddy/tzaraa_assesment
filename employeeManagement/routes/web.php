@@ -20,3 +20,7 @@ Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])->name('em
 Route::put('/employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
 
 Route::delete('/employee/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+
+Route::fallback(function() {
+    return view ('fallback');
+});

@@ -1,0 +1,133 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Fixes right-side margin/overflow */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7fe;
+}
+
+/* Layout Wrapper - The main container for your @yield */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 60px); /* Fill screen minus nav height */
+    padding: 20px;
+    width: 100%;
+}
+
+/* Form Card */
+form {
+    background: #ffffff;
+    width: 100%;
+    max-width: 450px; /* Prevents shrinking/stretching */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+form h1 {
+    margin-bottom: 25px;
+    text-align: center;
+    color: #334155;
+    font-size: 1.5rem;
+}
+
+/* Inputs & Selects */
+input[type="text"],
+input[type="email"],
+select {
+    width: 100%; /* Now stays inside because of box-sizing: border-box */
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    display: block;
+}
+
+input:focus, select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Radio Buttons */
+.status-group {
+    display: flex;
+    gap: 20px;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.status-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #475569;
+}
+
+/* Submit Button */
+button[type="submit"] {
+    width: 100%;
+    padding: 13px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: #2563eb;
+}
+
+/* Error Box Styling */
+.error-box {
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 20px;
+}
+
+.error-box ul {
+    list-style: none; /* Removes ugly default bullets */
+    background-color: #fff1f2; /* Soft red/rose background */
+    border-left: 4px solid #e11d48; /* Accent border for urgency */
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.error-box li {
+    color: #9f1239; /* Deep red for readability */
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+/* Optional: Adds a small dot/icon before each error message */
+.error-box li::before {
+    content: "•";
+    color: #e11d48;
+    font-weight: bold;
+    display: inline-block; 
+    width: 1em;
+    margin-left: -0.5em;
+}
+
+.error-box li:last-child {
+    margin-bottom: 0;
+}
+
