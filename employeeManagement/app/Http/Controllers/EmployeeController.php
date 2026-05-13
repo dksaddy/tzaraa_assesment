@@ -140,7 +140,8 @@ class EmployeeController extends Controller
         
         return response()->json([
             'success' => true,
-            'message' => 'Employee bio updated successfully!'
+            'message' => 'Employee bio updated successfully!',
+            'employee' => $emp,
         ]);
     }
 }

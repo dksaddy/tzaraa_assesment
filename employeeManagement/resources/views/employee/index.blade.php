@@ -144,9 +144,15 @@
             const row = document.getElementById(`employee-row-${employeeId}`);
             if (row) {
               // Update the specific cells (adjust the selectors to match your HTML)
-              row.querySelector('td:nth-child(2) strong').innerText = formData.get('name');
-              row.querySelector('td:nth-child(5)').innerText = formData.get('email');
-              row.querySelector('td:nth-child(6)').innerText = formData.get('phone');
+              row.querySelector('td:nth-child(2) strong').innerText = data.employee.name;
+              row.querySelector('td:nth-child(5)').innerText =  data.employee.email;
+              row.querySelector('td:nth-child(6)').innerText =  data.employee.phone;
+
+              const editBtn = row.querySelector('button[onclick^="openEditModal"]');
+              if (editBtn) {
+                // Pass the freshly updated data object back into the button
+                editBtn.setAttribute('onclick', `openEditModal(${JSON.stringify(data.employee)})`);
+              }
             }
 
             closeSimpleModal();
