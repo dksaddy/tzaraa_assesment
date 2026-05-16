@@ -31,6 +31,7 @@ class EmployeeController extends Controller
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
+            ->latest()
             ->get();
 
         return Inertia::render('Employee/Index', [
@@ -64,17 +65,17 @@ class EmployeeController extends Controller
         return redirect()->route('employee.index')->with('success', 'Employee added successfully!');
     }
 
-    public function edit($id)
-    {
-        $emp = Employee::findOrFail($id);
+    // public function edit($id)
+    // {
+    //     $emp = Employee::findOrFail($id);
         
-        return Inertia::render('Employee/Edit', [
-            'emp' => $emp,
-            'departments' => Department::all(),
-            // Pre-load current department's designations for the edit form
-            'designations' => Designation::where('department_id', $emp->department_id)->get()
-        ]);
-    }
+    //     return Inertia::render('Employee/Edit', [
+    //         'emp' => $emp,
+    //         'departments' => Department::all(),
+    //         // Pre-load current department's designations for the edit form
+    //         'designations' => Designation::where('department_id', $emp->department_id)->get()
+    //     ]);
+    // }
 
     // Still returns JSON for dynamic dependent dropdowns in React
     public function getDesignations($department_id) 
