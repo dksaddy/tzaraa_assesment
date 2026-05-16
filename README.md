@@ -1,98 +1,128 @@
-|What I have learned|
------4/5----------5/5---------------------------
+# 🚀 Laravel Learning Journey
 
-dir: routes -> route files: routes return the view.
-	
-VIEW [
-	Different routes from same parent. [use of prefix]
-	<< prefix --> group --> function --> route function  >>
-	<  adding a human readable route name: function->name("Whatever you want")  >
-	<< parameterized route >>
-	<  Fallback Route: when destined URL not found we use this  >
-	<< /up route to check application is running or not  >>
-	<  Passing Data from Route --> View ||->with('var name', $var)->with('email', $email)	   ||
-					    || view ('route', compact('name', 'email'))		   ||
-			LECTURE:9	    || view ('route', ['name' => $name, 'email' => $email])||
+---
 
-	<< loop and control statement inside blade template	>>
-	<  Sub View in blade using: 	   @include('directory.blade_file_name')
-	   Passing Value Parent --> Child: @include( same, ['name' => $var])	>
-]
+## 📊 Progress Status
+**Rating:** ⭐ 4/5 ➡️ 5/5
 
-CONTROLLER [
-	<< grouping the methods which are from same controller
-	|| Route::controller(StudentController::class)->group(function {
-		routes.........
-		});					||	>>
-	<  private function, constructor >
-	<< 2 types of controller |-> Invokable
-				 |-> Resource
-]
-	
+---
 
-dir: resources -> |-> CSS
-		  |-> JS
-		  |-> View (HTML) |-> blade Template.|-> Route View
-						     |-> Direct View
-dir: app -> Http -> Controllers |->
+## 🗺️ Directory & Core Concepts
 
+### 📍 `routes/` (Route Files Return the View)
+* **VIEW**
+  * Different routes from same parent. `[use of prefix]`
+  * `<< prefix --> group --> function --> route function >>`
+  * Adding a human readable route name: `function->name("Whatever you want")`
+  * `<< parameterized route >>`
+  * Fallback Route: when destined URL not found we use this
+  * `<< /up route to check application is running or not >>`
+  * Passing Data from Route ➡️ View:
+    * `|| ->with('var name', $var)->with('email', $email) ||`
+    * `|| view ('route', compact('name', 'email')) ||`
+    * **LECTURE 9:** `|| view ('route', ['name' => $name, 'email' => $email]) ||`
+  * `<< loop and control statement inside blade template >>`
+  * Sub View in blade using: `@include('directory.blade_file_name')`
+  * Passing Value Parent ➡️ Child: `@include( same, ['name' => $var])`
 
-Some Command:
-php artisan serve [run the server]
-2. php artisan route:list [show all the route]
-3. php artisan make:view name_of_view [To create view file]
-4. php artisan view:cache [to cache a blade file]
-5. php artisan view:clear [to clear cache]
+### 🎮 `CONTROLLER`
+* Grouping the methods which are from same controller:
+  ```php
+  Route::controller(StudentController::class)->group(function() {
+      // routes.........
+  });
+  ```
+* Private function, constructor
+* 2 types of controller:
+  * ➡️ Invokable
+  * ➡️ Resource
 
-CONTROLLER:
+### 📁 Directory Mapping
+* `dir: resources`
+  * ➡️ CSS
+  * ➡️ JS
+  * ➡️ View (HTML)
+    * ➡️ blade Template
+      * ➡️ Route View
+      * ➡️ Direct View
+* `dir: app` ➡️ `Http` ➡️ `Controllers` ➡️
+
+---
+
+## 💻 Technical Command Reference
+
+### 🔥 General Commands
+```bash
+php artisan serve          # run the server
+php artisan route:list     # show all the route
+php artisan make:view name # To create view file
+php artisan view:cache     # to cache a blade file
+php artisan view:clear     # to clear cache
+```
+
+### 🎮 Controller Commands
+```bash
 php artisan make:controller controller_of_name
 php artisan make:controller controller_of_name --invokable
 php artisan make:controller controller_of_name --resource
+```
 
-MIGRATION:
-php artisan migrate
-php artisan make:migration StudentTable
-php artisan make:migration create_students_table [it generates schema]
-php artisan make:migration addDateOfBirth --table=students [add col to existing table]
+### 🗄️ Migration Commands
+```bash
+php artisan migrate                                # run migrations
+php artisan make:migration StudentTable             # create basic migration
+php artisan make:migration create_students_table   # it generates schema
+php artisan make:migration addDateOfBirth --table=students # add col to existing table
+```
 
-Rollback
-5. php artisan migrate:rollback
-6. php artisan migrate:rollback --step=2/1/3
-7. php artisan migrate [like it was before]
-8. php artisan migrate:reset
+### 🔙 Rollback Commands
+```bash
+php artisan migrate:rollback          # rollback last batch
+php artisan migrate:rollback --step=2 # rollback specific steps (e.g., 1/2/3)
+php artisan migrate                   # migrate [like it was before]
+php artisan migrate:reset             # rollback all migrations
+```
 
-MODEL
-make:model Student
-make:model Teachers -mc [model, migration:m, controller:c]
+### 📦 Model Commands
+```bash
+php artisan make:model Student
+php artisan make:model Teachers -mc   # [model, migration:m, controller:c]
+```
 
+### 🌱 Factories for Database Seeding
+```bash
+php artisan make:factory StudentsFactory --model=Students
+```
+* Define in factory ➡️ in Model `|-> use 'HasFactory'` ➡️ `database/seeders`
+* **Seeding Commands:**
+  ```bash
+  php artisan db:seed
+  php artisan db:seed --class=CountriesSeeder # [without using factory and model]
+  ```
 
-Factories for Database Seeding
-make:factory StudentsFactory --model=Students
-define in factory -> in Model |-> use 'HasFactory' ---> database/seeders
-Seeding Command: php artisan db:seed
-4.   		    php artisan db:seed --class=CountriesSeeder [without using factory and model]
+---
 
-Executing SQL Query:[26]
-Raw SQL
-Query Builder |->DB::
-Eloquent ORM  |-> Model instance
-// When fetching data if I want to hide a col from select: go to model and     make the instance protected with $hidden var.
+## 🔍 Executing SQL Query [26]
+* **Raw SQL**
+* **Query Builder** `|-> DB::`
+* **Eloquent ORM** `|-> Model instance`
+* *Note:* When fetching data if I want to hide a col from select: go to model and make the instance protected with `$hidden` var.
+* With Eloquent I can use nested `where`
 
-// With Eloquent I can use nested where
+---
 
-// Assignment: 40-48 with validation
+## 📝 Assignments & Watching Tutorial again
+* **Assignment:** 40-48 with validation
+* **Clean Validation:** `php artisan make:request StudentAddRequest`
+* **Relationships:**
+  * `-belongs to` ➡️ child to parent.
+  * `-has` ➡️ parent to child.
+  * `--pivot(junction) table:` hold the info of two separate table. like `classes:subject` -> `class:subject`.
+* Make nice readme for github
 
-Clean Validation
-make:request StudentAddRequest
+---
 
-Problem I am facing
-name method confusionM
-I might need to watch the layout again [Lecture 12]
-gist.github.com/keeguon/2310008 [country list]
-
-
-Watching Tutorial again:
- -belongs to --> child to parent.
- -has --> parent to child.
-  --pivot(junction) table: hold the info of two separate table. like classes:subject-class:subject.
-  
+## ⚠️ Problems I am facing
+* [ ] `name` method confusion
+* [ ] I might need to watch the layout again `[Lecture 12]`
+* [ ] Reference link: [country list gist](https://github.com)
