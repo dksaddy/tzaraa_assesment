@@ -1,28 +1,27 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EmployeeController;
+use Inertia\Inertia;
 
-// Route::get('/', function () {
-    
-//     return view('Dashboard.employee');
-// });
-
-
-Route::get('/',[EmployeeController::class,'getAllEmployees']);
-Route::get('/search',[EmployeeController::class,'searchEmployees']);
-
-Route::get('/add',[EmployeeController::class,'create'])->name('add');
-Route::get('/get-designations/{department_id}', [EmployeeController::class, 'getDesignations']);
-Route::post('/add', [EmployeeController::class, 'store'])->name('employee.store');
-
-Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
-Route::put('/employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
-
-Route::delete('/employee/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
-
-Route::patch('/employee/bio/{id}', [EmployeeController::class, 'bioUpdate'])->name('employee.bioUpdate');
-
-Route::fallback(function() {
-    return view ('fallback');
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
