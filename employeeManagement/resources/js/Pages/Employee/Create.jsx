@@ -24,7 +24,7 @@ export default function Create({ departments = [] }) {
 
         setLoadingDesignations(true);
         
-        fetch(route('employees.designations', data.department_id))
+        fetch(route('departments.designations', data.department_id))
             .then((res) => res.json())
             .then((resData) => {
                 setDesignations(resData);
@@ -38,7 +38,7 @@ export default function Create({ departments = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('store'), {
+        post(route('employees.store'), {
             onSuccess: () => reset()
         });
     };

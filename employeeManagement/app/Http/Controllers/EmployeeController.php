@@ -10,60 +10,77 @@ use Inertia\Inertia;
 
 class EmployeeController extends Controller
 {
-    //
-    public function getAllEmployees()
+    // //
+    // public function getAllEmployees()
+    // {
+    //     $employee = Employee::with(['designation', 'department'])->get();
+    //     //$departments = Department::all();
+    //     return Inertia::render('Employee/Index', [
+    //         'employees' => $employee,
+    //         //'departments' => $departments,
+    //     ]);
+    // }
+
+    public function searchEmployees(Request $request)
     {
-        $employee = Employee::with(['designation', 'department'])->get();
-        //$departments = Department::all();
+        $search = $request->query('search');
+        $deptId = $request->query('department_id');
+        $status = $request->query('status');
+
+        /*
+        Line: 33. Without the with() method, if you tried to access $employee->designation->name in a loop, 
+                  Laravel would run a new database query for every single employee.
+        Line: 35: $search: checks is empty or not, use($search) for access the variable in the closure function.
+        Line: 37: query,q --> store sql query. q -> add extra parentheses to group the OR conditions together.
+        */
+
+        $employee = Employee::with('designation', 'department')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%");
+                });
+            })
+            ->when($deptId, function ($query) use ($deptId) {
+                $query->where('department_id', $deptId);
+            })
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->get();
+
+        $departments = Department::all();
+
         return Inertia::render('Employee/Index', [
             'employees' => $employee,
-            //'departments' => $departments,
+            'departments' => $departments,
+            'filters' => [
+                'search' => $search,
+                'department_id' => $deptId,
+                'status' => $status,
+            ],
         ]);
     }
-
-    // public function searchEmployees(Request $request)
-    // {
-    //     $search = $request->query('search');
-    //     $deptId = $request->query('department_id');
-    //     $status = $request->query('status');
-
-    //     /*
-    //     Line: 33. Without the with() method, if you tried to access $employee->designation->name in a loop, 
-    //               Laravel would run a new database query for every single employee.
-    //     Line: 35: $search: checks is empty or not, use($search) for access the variable in the closure function.
-    //     Line: 37: query,q --> store sql query. q -> add extra parentheses to group the OR conditions together.
-    //     */
-
-    //     $employee = Employee::with('designation', 'department')
-    //         ->when($search, function ($query) use ($search) {
-    //             $query->where(function ($q) use ($search) {
-    //                 $q->where('name', 'like', "%$search%")
-    //                     ->orWhere('email', 'like', "%$search%")
-    //                     ->orWhere('phone', 'like', "%$search%");
-    //             });
-    //         })
-    //         ->when($deptId, function ($query) use ($deptId) {
-    //             $query->where('department_id', $deptId);
-    //         })
-    //         ->when($status, function ($query) use ($status) {
-    //             $query->where('status', $status);
-    //         })
-    //         ->get();
-
-    //     $departments = Department::all();
-
-    //     return view('employee.index', compact('employee', 'departments'));
-    // }
 
 
     public function create()
     {
-        $departments = Department::all(); 
+        $departments = Department::all();
         return Inertia::render('Employee/Create', ['departments' => $departments]);
     }
 
-    public function getDesignations($department_id) {
-        $designations = Designation::where('department_id', $department_id)->get();
+    public function getDesignations($department_id)
+    {
+        if (!$department_id) {
+            return response()->json([]);
+        }
+
+        $designations = Designation::where(
+            'department_id',
+            $department_id
+        )->get();
+
         return response()->json($designations);
     }
 
@@ -79,72 +96,36 @@ class EmployeeController extends Controller
         ]);
 
         Employee::create($validated);
-        return redirect('/')->with('success', 'Employee added successfully!');
+        return redirect()->route('employees')->with('success', 'Employee added successfully!');
     }
 
 
-    // public function edit($id)
-    // {
-    //     $emp = Employee::findOrFail($id);
-    //     $departments = Department::all();
-    //     $designations = Designation::where('department_id', $emp->department_id)->get();
-    //     return view('employee.edit', compact('emp', 'departments', 'designations'));
-    // }
+    public function update(Request $request, $id)
+    {
+        $emp = Employee::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:employee,email,' . $id,
+            'phone' => 'required',
+            'designation_id' => 'required',
+            'department_id' => 'required',
+            'status' => 'required',
+        ]);
+
+        $emp->update($validated);
+        return redirect()->route('employees')->with('success', 'Employee updated successfully!');
+    }
 
 
-    // public function update(Request $request, $id)
-    // {
-    //     $emp = Employee::findOrFail($id);
+    public function destroy($id)
+    {
+        $employee = Employee::findOrFail($id);
 
-    //     $validated = $request->validate([
-    //         'name' => 'required',
-    //         'email' => 'required|email|unique:employee,email,' . $id,
-    //         'phone' => 'required',
-    //         'designation_id' => 'required',
-    //         'department_id' => 'required',
-    //         'status' => 'required',
-    //     ]);
+        $employee->delete();
 
-    //     $emp->update($validated);
-    //     return redirect('/')->with('success', 'Employee updated successfully!');
-    // }
-
-
-    // public function destroy($id)
-    // {
-    //     try {
-    //         $emp = Employee::findOrFail($id);
-    //         $emp->delete();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Employee deleted successfully!'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Could not find or delete employee.'
-    //         ], 404);
-    //     }
-    // }
-
-
-    // public function bioUpdate(Request $request, $id)
-    // {
-    //     $emp = Employee::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'name' => 'required',
-    //         'email' => 'required|email|unique:employee,email,' . $id,
-    //         'phone' => 'required',
-    //     ]);
-
-    //     $emp->update($validated);
-        
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Employee bio updated successfully!',
-    //         'employee' => $emp,
-    //     ]);
-    // }
+        return redirect()
+            ->route('employees')
+            ->with('success', 'Employee deleted successfully!');
+    }
 }

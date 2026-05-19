@@ -25,12 +25,28 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/employees', [EmployeeController::class, 'getAllEmployees'])->middleware(['auth', 'verified'])->name('employees');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::get('/create', [EmployeeController::class, 'create'])->middleware(['auth', 'verified'])->name('create');
-Route::get('/departments/{department}/designations', [EmployeeController::class, 'getDesignations'])->middleware(['auth', 'verified'])->name('employees.designations');
-Route::post('/store', [EmployeeController::class, 'store'])->middleware(['auth', 'verified'])->name('store');
+    Route::get('/employees', [EmployeeController::class, 'searchEmployees'])
+        ->name('employees');
+
+    Route::post('/employees', [EmployeeController::class, 'store'])
+        ->name('employees.store');
+
+    Route::put('/employees/{id}', [EmployeeController::class, 'update'])
+        ->name('employees.update');
+
+    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
+        ->name('employees.destroy');
+
+    Route::get('/employees/create', [EmployeeController::class, 'create'])
+        ->name('employees.create');
+
+    Route::get(
+        '/departments/{department_id}/designations',
+        [EmployeeController::class, 'getDesignations']
+    )->name('departments.designations');
+});
 
 
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
