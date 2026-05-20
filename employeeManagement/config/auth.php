@@ -42,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'api' => [
+            'driver' => 'jwt', // Change 'sanctum' or 'token' to 'jwt'
+            'provider' => 'users',
+        ],
     ],
 
     /*

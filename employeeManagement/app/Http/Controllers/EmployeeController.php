@@ -10,16 +10,24 @@ use Inertia\Inertia;
 
 class EmployeeController extends Controller
 {
-    // //
-    // public function getAllEmployees()
-    // {
-    //     $employee = Employee::with(['designation', 'department'])->get();
-    //     //$departments = Department::all();
-    //     return Inertia::render('Employee/Index', [
-    //         'employees' => $employee,
-    //         //'departments' => $departments,
-    //     ]);
-    // }
+    //
+    public function getAllEmployees(Request $request)
+    {
+        $employee = Employee::with(['designation', 'department'])->get();
+        //$departments = Department::all();
+
+        // 2. If the request comes from Postman or an API client, return pure JSON data
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'employees' => $employee
+            ]);
+        }
+        return Inertia::render('Employee/Index', [
+            'employees' => $employee,
+            //'departments' => $departments,
+        ]);
+    }
 
     public function searchEmployees(Request $request)
     {
