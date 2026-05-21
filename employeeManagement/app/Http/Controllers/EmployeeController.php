@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
 use App\Models\Designation;
 use App\Models\Department;
+use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class EmployeeController extends Controller
 {
-    //
+    protected $employeeService;
+
+    public function __construct(EmployeeService $employeeService)
+    {
+        $this->employeeService = $employeeService;
+    }
+
     public function getAllEmployees(Request $request)
     {
         $employee = Employee::with(['designation', 'department'])->get();
@@ -31,43 +37,19 @@ class EmployeeController extends Controller
 
     public function searchEmployees(Request $request)
     {
-        $search = $request->query('search');
-        $deptId = $request->query('department_id');
-        $status = $request->query('status');
+        $filters = [
+            'search'        => $request->query('search'),
+            'department_id' => $request->query('department_id'),
+            'status'        => $request->query('status'),
+        ];
 
-        /*
-        Line: 33. Without the with() method, if you tried to access $employee->designation->name in a loop, 
-                  Laravel would run a new database query for every single employee.
-        Line: 35: $search: checks is empty or not, use($search) for access the variable in the closure function.
-        Line: 37: query,q --> store sql query. q -> add extra parentheses to group the OR conditions together.
-        */
-
-        $employee = Employee::with('designation', 'department')
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%$search%")
-                        ->orWhere('email', 'like', "%$search%")
-                        ->orWhere('phone', 'like', "%$search%");
-                });
-            })
-            ->when($deptId, function ($query) use ($deptId) {
-                $query->where('department_id', $deptId);
-            })
-            ->when($status, function ($query) use ($status) {
-                $query->where('status', $status);
-            })
-            ->get();
-
+        $employees = $this->employeeService->getFilteredEmployees($filters);
         $departments = Department::all();
 
         return Inertia::render('Employee/Index', [
-            'employees' => $employee,
+            'employees'   => $employees,
             'departments' => $departments,
-            'filters' => [
-                'search' => $search,
-                'department_id' => $deptId,
-                'status' => $status,
-            ],
+            'filters'     => $filters,
         ]);
     }
 
@@ -98,42 +80,37 @@ class EmployeeController extends Controller
             'name'           => 'required|string|max:255',
             'email'          => 'required|email|unique:employee,email',
             'phone'          => 'required|unique:employee,phone',
-            'department_id'  => 'required|exists:department,id', // Added validation
+            'department_id'  => 'required|exists:department,id',
             'designation_id' => 'required|exists:designation,id',
             'status'         => 'required|in:active,inactive'
         ]);
 
-        Employee::create($validated);
+        $this->employeeService->createEmployee($validated);
+
         return redirect()->route('employees')->with('success', 'Employee added successfully!');
     }
 
 
     public function update(Request $request, $id)
     {
-        $emp = Employee::findOrFail($id);
-
         $validated = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:employee,email,' . $id,
-            'phone' => 'required',
+            'name'           => 'required',
+            'email'          => 'required|email|unique:employee,email,' . $id,
+            'phone'          => 'required',
             'designation_id' => 'required',
-            'department_id' => 'required',
-            'status' => 'required',
+            'department_id'  => 'required',
+            'status'         => 'required',
         ]);
 
-        $emp->update($validated);
+        $this->employeeService->updateEmployee($id, $validated);
+
         return redirect()->route('employees')->with('success', 'Employee updated successfully!');
     }
 
-
     public function destroy($id)
     {
-        $employee = Employee::findOrFail($id);
+        $this->employeeService->deleteEmployee($id);
 
-        $employee->delete();
-
-        return redirect()
-            ->route('employees')
-            ->with('success', 'Employee deleted successfully!');
+        return redirect()->route('employees')->with('success', 'Employee deleted successfully!');
     }
 }
