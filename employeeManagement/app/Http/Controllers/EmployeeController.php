@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Designation;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
