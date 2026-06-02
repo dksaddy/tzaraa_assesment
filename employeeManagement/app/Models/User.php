@@ -13,6 +13,12 @@ class User extends Authenticatable implements JWTSubject // 2. Implement the int
 {
     use HasFactory, Notifiable, HasApiTokens;
 
+     protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
     protected function casts(): array
     {
         return [

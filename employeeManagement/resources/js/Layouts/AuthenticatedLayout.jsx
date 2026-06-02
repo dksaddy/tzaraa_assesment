@@ -7,9 +7,9 @@ import { useState } from "react";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const notifications = usePage().props.auth.notifications || [];
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
         <div className="min-h-screen bg-white">
@@ -35,6 +35,61 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
+
+                            {/* ================= NOTIFICATION BELL DROPDOWN START ================= */}
+                <div className="relative ms-3">
+                    <Dropdown>
+                        <Dropdown.Trigger>
+                            <span className="inline-flex rounded-md">
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center relative rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                >
+                                    {/* Bell Icon SVG */}
+                                    <svg className="h-6 w-6" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                                    </svg>
+
+                                    {/* Red Notification Badge */}
+                                    {usePage().props.auth.notifications?.length > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                            {usePage().props.auth.notifications.length}
+                                        </span>
+                                    )}
+                                </button>
+                            </span>
+                        </Dropdown.Trigger>
+
+                        <Dropdown.Content contentClasses="py-1 bg-white w-80 max-h-96 overflow-y-auto">
+                            <div className="px-4 py-2 text-xs font-semibold text-gray-400 border-b border-gray-100">
+                                Notifications
+                            </div>
+                            
+                            {/* Listing Notifications */}
+                            {!usePage().props.auth.notifications || usePage().props.auth.notifications.length === 0 ? (
+                                <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                                    No new notifications
+                                </div>
+                            ) : (
+                                usePage().props.auth.notifications.map((notification) => (
+                                    <div 
+                                        key={notification.id} 
+                                        className="px-4 py-3 text-sm text-gray-700 border-b border-gray-500/10 hover:bg-gray-50 transition last:border-b-0"
+                                    >
+                                        <p className="font-medium text-gray-800">
+                                            {notification.data.message}
+                                        </p>
+                                        <span className="text-[10px] text-gray-400 block mt-1">
+                                            {new Date(notification.data.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
+                        </Dropdown.Content>
+                    </Dropdown>
+                </div>
+                {/* ================= NOTIFICATION BELL DROPDOWN END ================= */}
+
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>

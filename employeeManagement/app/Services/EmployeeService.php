@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Models\User;
+use App\Notifications\EmployeeCreatedNotification;
+use Illuminate\Support\Facades\Notification;
 
 class EmployeeService
 {
@@ -20,7 +23,16 @@ class EmployeeService
 
     public function createEmployee(array $data)
     {
-        return $this->employeeRepo->store($data);
+        // 1. Save the employee using your repository
+        $employee = $this->employeeRepo->store($data);
+
+        // 2. Fetch all system users who should get this notification
+        $users = User::all();
+
+        // 3. Send the notification to all of them
+        Notification::send($users, new EmployeeCreatedNotification($employee->name));
+
+        return $employee;
     }
 
     public function updateEmployee($id, array $data)
