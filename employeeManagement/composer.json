@@ -9,9 +9,11 @@
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^13.7",
+        "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "php-open-source-saver/jwt-auth": "^2.9",
+        "pusher/pusher-php-server": "*",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
