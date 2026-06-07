@@ -33,10 +33,20 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-                // Pass unread notifications if a user is logged in
+
                 'notifications' => $request->user()
-                    ? $request->user()->unreadNotifications
+                    ? $request->user()
+                    ->notifications()
+                    ->latest()
+                    ->take(50)
+                    ->get()
                     : [],
+
+                'unread_count' => $request->user()
+                    ? $request->user()
+                    ->unreadNotifications()
+                    ->count()
+                    : 0,
             ],
         ];
     }

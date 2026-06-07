@@ -5,7 +5,10 @@ import { FiBell } from "react-icons/fi";
 export default function NotificationDropdown({
     notifications,
     onNotificationClick,
+    markAllRead,
 }) {
+    const unreadCount = notifications.filter((n) => n.read_at === null).length;
+
     return (
         <div className="relative ms-3">
             <Dropdown>
@@ -17,21 +20,26 @@ export default function NotificationDropdown({
                         >
                             <FiBell className="w-6 h-6" />
 
-                            {notifications.length > 0 && (
-                                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                                    {notifications.length}
-                                </span>
-                            )}
+                            {unreadCount > 0 && <span>{unreadCount}</span>}
                         </button>
                     </span>
                 </Dropdown.Trigger>
 
                 <Dropdown.Content contentClasses="py-1 bg-white w-80 max-h-96 overflow-y-auto">
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-400 border-b">
-                        Notifications
+                    <div className="flex justify-between items-center px-4 py-2 border-b">
+                        <span className="text-xs font-semibold">
+                            Notifications
+                        </span>
+
+                        <button
+                            onClick={markAllRead}
+                            className="text-xs text-blue-500"
+                        >
+                            Mark all as read
+                        </button>
                     </div>
 
-                    {notifications.length === 0 ? (
+                    {unreadCount === 0 ? (
                         <div className="px-4 py-3 text-center text-sm text-gray-500">
                             No new notifications
                         </div>

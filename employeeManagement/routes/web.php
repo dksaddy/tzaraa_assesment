@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -48,5 +49,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     )->name('departments.designations');
 });
 
+Route::middleware('auth')->group(function () {
+
+    Route::post(
+        '/notifications/{notificationId}/read',
+        [NotificationController::class, 'markAsRead']
+    );
+
+    Route::post(
+        '/notifications/read-all',
+        [NotificationController::class, 'markAllAsRead']
+    );
+});
 
 require __DIR__ . '/auth.php';

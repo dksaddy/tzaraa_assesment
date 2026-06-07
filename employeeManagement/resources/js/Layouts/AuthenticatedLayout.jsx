@@ -1,6 +1,7 @@
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
+import axios from "axios";
 
 import useNotifications from "@/Hooks/useNotifications";
 
@@ -10,31 +11,41 @@ import UserDropdown from "@/Components/Navigation/UserDropdown";
 import MobileMenuButton from "@/Components/Navigation/MobileMenuButton";
 import NotificationDropdown from "@/Components/Navigation/NotificationDropdown";
 
-export default function AuthenticatedLayout({
-    header,
-    children,
-}) {
+export default function AuthenticatedLayout({ header, children }) {
     const { auth } = usePage().props;
 
-    const {
-        notifications,
-        setNotifications,
-    } = useNotifications(auth);
+    const { notifications, setNotifications } = useNotifications(auth);
 
-    const [
-        showingNavigationDropdown,
-        setShowingNavigationDropdown,
-    ] = useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
 
-    const handleNotificationClick = (id) => {
-        console.log("Clicked:", id);
+    const handleNotificationClick = async (id) => {
+        try {
+            await axios.post(`/notifications/${id}/read`);
+
+            setNotifications((prev) =>
+                prev.map((notification) =>
+                    notification.id === id
+                        ? {
+                              ...notification,
+                              read_at: new Date().toISOString(),
+                          }
+                        : notification,
+                ),
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const markAllRead = async () => {
+        await axios.post("/notifications/read-all");
 
         setNotifications((prev) =>
-            prev.map((n) =>
-                n.id === id
-                    ? { ...n, read_at: new Date() }
-                    : n
-            )
+            prev.map((notification) => ({
+                ...notification,
+                read_at: new Date().toISOString(),
+            })),
         );
     };
 
@@ -56,35 +67,25 @@ export default function AuthenticatedLayout({
                         <div className="hidden sm:flex sm:items-center">
                             <NotificationDropdown
                                 notifications={notifications}
-                                onNotificationClick={
-                                    handleNotificationClick
-                                }
+                                onNotificationClick={handleNotificationClick}
+                                markAllRead={markAllRead}
                             />
 
-                            <UserDropdown
-                                user={auth.user}
-                            />
+                            <UserDropdown user={auth.user} />
                         </div>
 
                         <MobileMenuButton
-                            open={
-                                showingNavigationDropdown
-                            }
+                            open={showingNavigationDropdown}
                             onClick={() =>
                                 setShowingNavigationDropdown(
-                                    !showingNavigationDropdown
+                                    !showingNavigationDropdown,
                                 )
                             }
                         />
                     </div>
                 </div>
 
-                <MobileNav
-                    open={
-                        showingNavigationDropdown
-                    }
-                    user={auth.user}
-                />
+                <MobileNav open={showingNavigationDropdown} user={auth.user} />
             </nav>
 
             {header && (
