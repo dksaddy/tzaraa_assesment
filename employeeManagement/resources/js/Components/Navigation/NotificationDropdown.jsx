@@ -39,7 +39,7 @@ export default function NotificationDropdown({
                         </button>
                     </div>
 
-                    {unreadCount === 0 ? (
+                    {notifications.length === 0 ? (
                         <div className="px-4 py-3 text-center text-sm text-gray-500">
                             No new notifications
                         </div>
