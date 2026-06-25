@@ -7,6 +7,10 @@ use App\Models\User;
 use App\Notifications\EmployeeCreatedNotification;
 use Illuminate\Support\Facades\Notification;
 
+use Illuminate\Notifications\AnonymousNotifiable;
+use App\Models\Employee;
+use App\Notifications\EmployeeUpdatedNotification;
+
 class EmployeeService
 {
     protected $employeeRepo;
@@ -37,7 +41,16 @@ class EmployeeService
 
     public function updateEmployee($id, array $data)
     {
-        return $this->employeeRepo->update($id, $data);
+        $employee = $this->employeeRepo->update($id, $data);
+
+        Notification::route(
+            'mail',
+            'msadik193086@bscse.uiu.ac.bd'
+        )->notify(
+            new EmployeeUpdatedNotification($employee)
+        );
+
+        return $employee;
     }
 
     public function deleteEmployee($id)
